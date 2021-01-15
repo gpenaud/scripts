@@ -1,0 +1,7 @@
+version: "3.7"
+
+services:
+  ports-retriever:
+    image: ports-retriever:latest
+    build:
+      context: .

@@ -1,0 +1,101 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+</head>
+<body>
+  <div style="max-width: 800px; margin: auto;">
+    <h2>Deploy AVS4.0 by branches</h2>
+    <form class="pure-form pure-form-aligned">
+      <h4>Environment</h4>
+      <fieldset class="pure-control-group" style="display: flex; justify-content: flex-start">
+        <legend>type:</legend>
+        <!-- ELEMENT environment type -->
+        <div id="environment_type_wrapper">
+          <label for="environment_type">type:</label>
+          <select class="select-style" id="environment_type" onchange="show_instances()">
+            <option value="test" selected="selected">test</option>
+            <option value="aq">aq</option>
+            <option value="rollout">rollout</option>
+          </select>
+        </div>
+
+        <!-- ELEMENT environment instance -->
+        <div id="environment_aq_instance_wrapper" hidden>
+          <label for="environment_aq_instance">instance:</label>
+          <select class="select-style" id="environment_aq_instance">
+            <option value="0" selected="selected">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <!-- ELEMENT backends -->
+      <h4>Backends</h4>
+      {{ range $backend, $backend_data := . }}
+      <legend>{{ $backend }}:</legend>
+      <fieldset class="pure-control-group">
+        <div id="{{ $backend }}_ref_type_wrapper">
+          <label for="{{ $backend }}_ref_type" >ref type:</label>
+          <select class="select-style" id="{{ $backend }}_ref_type" onchange="show_ref_type(this)">
+            <option value="branch" selected="selected">branch</option>
+            <option value="tag">tag</option>
+          </select>
+        </div>
+        <div id="{{ $backend }}_branches_wrapper" class="ref_type_branch">
+          <label for="{{ $backend }}_branches">branch:</label>
+          <select class="select-style" id="{{ $backend }}_branches">
+            {{ range $branch := $backend_data.Branches }}
+            <option>{{ $branch.Name }}</option>
+            {{ end }}
+          </select>
+        </div>
+        <div id="{{ $backend }}_tags_wrapper" class="ref_type_tag" hidden>
+          <label for="{{ $backend }}_tags">tag:</label>
+          <select class="select-style" id="{{ $backend }}_tags">
+            {{ range $tag := $backend_data.Tags }}
+            <option>{{ $tag.Name }}</option>
+            {{ end }}
+          </select>
+        </div>
+      </fieldset>
+      {{ end }}
+    </form>
+  </div>
+</body>
+</html>
+
+<script type="text/javascript">
+  function show_instances() {
+    var environment_type                = document.getElementById("environment_type");
+    var environment_aq_instance_wrapper = document.getElementById("environment_aq_instance_wrapper");
+
+    if (environment_type.options[environment_type.selectedIndex].value == 'aq') {
+      environment_aq_instance_wrapper.removeAttribute("hidden");
+    } else {
+      environment_aq_instance_wrapper.setAttribute("hidden", true);
+    }
+  }
+
+  function show_ref_type(element) {
+    var backend  = element.id.replace('_ref_type','')
+
+    var branch_block = document.getElementById(backend + "_branches_wrapper");
+    var tag_block    = document.getElementById(backend + "_tags_wrapper");
+
+    if (element.options[element.selectedIndex].value == 'branch') {
+      tag_block.setAttribute("hidden", true);
+      branch_block.removeAttribute("hidden");
+    }
+
+    if (element.options[element.selectedIndex].value == 'tag') {
+      tag_block.removeAttribute("hidden");
+      branch_block.setAttribute("hidden", true);
+    }
+  }
+</script>
